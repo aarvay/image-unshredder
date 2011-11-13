@@ -1,4 +1,17 @@
 Thanks to Instagram for posting this interesting challenge. This gave me an
 opportunity to get started with image processing. Went to landmark, sat there
 for 3 hours and read some of the related chapters from DIP by Gonzalez & Woods.
-Trying my hand at this right now!
+
+The first part is done! (Assuming a strip width of 32)
+Here's how I worked out my solution :
+
+DISCLAIMER : I only read those chapters on connectivity, adjacency, distance! My solution is based only within this domain!
+Assumption (That turned out to be right): Two strips that are close must have almost similar pixel colors. So basicaly match strips.
+
+[1] For each strip find its "best" neighbour-strip, i.e, a strip that as almost similar pixel colors.
+[2] To accomplish this, I used a simple scoring mechanism
+[3] I computed the euclidean distance between them for each color-range. Did some heuristics to arrive at the value 8.
+[4] If score higher, update the highest score. (The usual way of scoring)
+[5] From right to left, repeat the same process on the input and paste the chosen strips to the output image.
+
+Please do let me know if you have a better way to solve this. I am ready to expand my knowledge on Image Processing ;-)

@@ -1,0 +1,11 @@
+# Temporary files of every sort
+.sass-cache/*
+.DS_Store
+.idea
+.redcar
+.rvmrc
+.stgit*
+*.swap
+*.swo
+*.swp
+*~

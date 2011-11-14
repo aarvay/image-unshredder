@@ -19,10 +19,10 @@ def getPixelValue(x, y):
 	return pixel 
 
 def computeDistance(p, q):
-	rd = p[0] - q[0]
-	gd = p[1] - q[1]
-	bd = p[2] - q[2]
-	distance = sqrt(( rd*rd + gd*gd + bd*bd ))
+	r = p[0] - q[0]
+	g = p[1] - q[1]
+	b = p[2] - q[2]
+	distance = sqrt(( r*r + g*g + b*b ))
 	return distance
 
 def computeScore(strip1, strip2, stripWidth, colourRangeSize):
@@ -36,23 +36,13 @@ def computeScore(strip1, strip2, stripWidth, colourRangeSize):
 			if i+colourRange < height:
 				pixel1 = getPixelValue((stripWidth*strip1)+(stripWidth-1), (i+colourRange))
 				pixel2 = getPixelValue((stripWidth*strip2), (i+colourRange))
+				for j in range(0, 3):
+					avgPixel1[j] = avgPixel1[j] + pixel1[j]
+					avgPixel2[j] = avgPixel2[j] + pixel2[j]
+		for j in range(0, 3):
+			avgPixel1[j] = avgPixel1[j] / colourRangeSize
+			avgPixel2[j] = avgPixel2[j] / colourRangeSize
 				
-				avgPixel1[0] = avgPixel1[0] + pixel1[0]
-				avgPixel1[1] = avgPixel1[1] + pixel1[1]
-				avgPixel1[2] = avgPixel1[2] + pixel1[2]
-			
-				avgPixel2[0] = avgPixel2[0] + pixel2[0]
-				avgPixel2[1] = avgPixel2[1] + pixel2[1]
-				avgPixel2[2] = avgPixel2[2] + pixel2[2]
-		
-		avgPixel1[0] = avgPixel1[0] / colourRangeSize
-		avgPixel1[1] = avgPixel1[1] / colourRangeSize
-		avgPixel1[2] = avgPixel1[2] / colourRangeSize
-		
-		avgPixel2[0] = avgPixel2[0] / colourRangeSize
-		avgPixel2[1] = avgPixel2[1] / colourRangeSize
-		avgPixel2[2] = avgPixel2[2] / colourRangeSize
-		
 		distance = computeDistance(avgPixel1, avgPixel2)
 		if distance < threshold:
 			score = score + 1
@@ -72,13 +62,11 @@ def findBestNeighbour(strip, colourRange):
 	return (bestStrip, bestScore)
 
 def unshred(shreddedImage):
-	score = 1000
+	score = 1<<29
 	finalStrip = -1
 	stripMap = {}
-	colourRange = 8
-	if stripWidth < 8:
-		colourRange = 2
-		
+	colourRange = 8 #Upto 8 works good! stepping in eights saves some time
+	
 	for strip in range(0, totalStrips):
 		neighbour = findBestNeighbour(strip, colourRange)
 		stripMap[neighbour[0]] = strip

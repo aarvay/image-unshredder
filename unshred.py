@@ -15,8 +15,12 @@ if (len(sys.argv) <> 3):
 	sys.exit()
 
 def getPixelValue(x, y):
+	pixelData = shreddedImage.getdata()
 	pixel = pixelData[y * width + x]
-	return pixel 
+	return pixel
+
+def computeStripDifference(colourRange, height, score):
+	return int(round(height / colourRange) - score)
 
 def computeDistance(p, q):
 	r = p[0] - q[0]
@@ -86,13 +90,38 @@ def unshred(shreddedImage):
 		if nextStrip in stripMap.keys():
 			nextStrip = stripMap[nextStrip]
 	
-	unshreddedImage.save(sys.argv[2], "png")
+	unshreddedImage.save(sys.argv[2])
+
+def computeStripWidth():
+	minStripWidth = 2
+	maxStripWidth = width / 2
+	stripWidth = - 1<<29 #Random negative value
+	stripDifference = -1
+	threshold = 2 #This value worked out to be the best!
+	
+	for currentStripWidth in range(minStripWidth, maxStripWidth+1, 1):
+		if width % currentStripWidth <> 0:
+			continue
+		
+		total=0
+		for i in range(0, (width / currentStripWidth)):
+			if (i+1) < (width / currentStripWidth):
+				result = computeStripDifference(8, height, computeScore(i, i+1, currentStripWidth, 8))
+				total += result
+				
+			avgStripDifference = total / (width / currentStripWidth)
+		if avgStripDifference > stripDifference:
+			if currentStripWidth % stripWidth == 0:
+				if abs(avgStripDifference - stripDifference) <= threshold:
+					continue
+			stripWidth = currentStripWidth
+			stripDifference = avgStripDifference
+	return stripWidth
 
 try:
 	shreddedImage = Image.open(sys.argv[1])
-	pixelData = shreddedImage.getdata()
 	width, height = shreddedImage.size
-	stripWidth = 32
+	stripWidth = computeStripWidth()
 	totalStrips = width / stripWidth
 	unshred(shreddedImage)
 except(IOError):
